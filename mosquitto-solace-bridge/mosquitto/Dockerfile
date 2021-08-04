@@ -1,6 +1,6 @@
 #FROM eclipse-mosquitto:2.0.11
 FROM eclipse-mosquitto:latest
-#LABEL maintainer "Otto Quaglio <otto.q@gmx.com>"
+LABEL maintainer "Otto Quaglio <otto.q@gmx.com>"
 
 COPY ./mosquitto.conf /mosquitto/config/
 
