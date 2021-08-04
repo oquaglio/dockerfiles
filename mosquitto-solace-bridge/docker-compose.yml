@@ -1,11 +1,44 @@
-version: "3.9"
+version: "0.1"
+
+networks:
+  hanet: {}
+
+x-environment:                            # set environment variables
+  &default-environment
+  username_admin_globalaccesslevel: admin
+  username_admin_password: ${ADMIN_PASSWORD:-admin}
+  system_scaling_maxconnectioncount: 100
+  redundancy_enable: "yes"
+  redundancy_group_password: topsecret
+  redundancy_group_node_primary_connectvia: primary
+  redundancy_group_node_primary_nodetype: message_routing
+  redundancy_group_node_backup_connectvia: backup
+  redundancy_group_node_backup_nodetype: message_routing
+  redundancy_group_node_monitoring_connectvia: monitoring
+  redundancy_group_node_monitoring_nodetype: monitoring
+
+x-common:
+    &default-common
+    image: solace/solace-pubsub-standard:${TAG:-latest}
+    shm_size: 1g
+    ulimits:
+      core: 1
+      nofile:
+        soft: 2448
+        hard: 38048
+    networks:
+      - hanet
+
 services:
+  
   mosquitto:
     build: mosquitto
     ports:
       - "1895:1883"
-  solace1:
-    build: solace
+  
+  solace1:                                # will build image <dir>_solace1
+    container_name: solace-primary        # when container created from image
+    hostname: solace-primary              # set hostname of container
     ports:
       - "1888:1883"
       - "2225:2222"
@@ -15,14 +48,11 @@ services:
       - "84:8008"
       - "8083:8080"
       - "9004:9000"
-  solace2:
-    build: solace
-    ports:
-      - "1889:1883"
-      - "2226:2222"
-      - "55560:55555"
-      - "5676:5672"
-      - "8004:8000"
-      - "85:8008"
-      - "8084:8080"
-      - "9005:9000" 
+    environment: 
+      << : *default-environment
+      routername: primary
+      configsync_enable: "yes"
+      redundancy_matelink_connectvia: backup
+      redundancy_activestandbyrole: primary
+      service_semp_tlsport: 1943
+    << : *default-common
