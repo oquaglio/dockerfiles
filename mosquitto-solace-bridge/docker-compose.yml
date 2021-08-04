@@ -1,1 +1,15 @@
-{\rtf1}
+version: "3.9"
+services:
+  mosquitto:
+    build: mosquitto
+    ports:
+      - "8000:8000"
+  solace1:
+    build: solace
+    ports:
+      - "8001:5432"      
+  solace2:
+    build: solace
+    ports:
+      - "8001:5432"      
+
