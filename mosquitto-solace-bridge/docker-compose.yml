@@ -1,9 +1,9 @@
-version: "0.1"
+version: "3.8"
 
 networks:
-  hanet: {}
+  solace-ha-net: {}
 
-x-environment:                            # set environment variables
+x-environment:
   &default-environment
   username_admin_globalaccesslevel: admin
   username_admin_password: ${ADMIN_PASSWORD:-admin}
@@ -18,37 +18,41 @@ x-environment:                            # set environment variables
   redundancy_group_node_monitoring_nodetype: monitoring
 
 x-common:
-    &default-common
-    image: solace/solace-pubsub-standard:${TAG:-latest}
-    shm_size: 1g
-    ulimits:
-      core: 1
-      nofile:
-        soft: 2448
-        hard: 38048
-    networks:
-      - hanet
+  &default-common
+  image: solace/solace-pubsub-standard:${TAG:-latest}
+  shm_size: 1g
+  ulimits:
+    core: 1
+    nofile:
+      soft: 2448
+      hard: 38048
+  networks:
+    - solace-ha-net
 
 services:
-  
+
   mosquitto:
+    container_name: mosquitto
+    hostname: mosquitto
+    #image:  eclipse-mosquitto:latest
     build: mosquitto
     ports:
       - "1895:1883"
-  
-  solace1:                                # will build image <dir>_solace1
-    container_name: solace-primary        # when container created from image
-    hostname: solace-primary              # set hostname of container
+    networks:
+      - solace-ha-net
+
+  #mosquitto:
+  #  build: mosquitto
+  #  ports:
+  #    - "1895:1883"
+
+  primary:
+    container_name: primary
+    hostname: primary
     ports:
-      - "1888:1883"
-      - "2225:2222"
-      - "55559:55555"
-      - "5675:5672"
-      - "8003:8000"
-      - "84:8008"
-      - "8083:8080"
-      - "9004:9000"
-    environment: 
+      - "212:2222"
+      - '8081:8080'
+    environment:
       << : *default-environment
       routername: primary
       configsync_enable: "yes"
@@ -56,3 +60,67 @@ services:
       redundancy_activestandbyrole: primary
       service_semp_tlsport: 1943
     << : *default-common
+
+  backup:
+    container_name: backup
+    hostname: backup
+    ports:
+      - "213:2222"
+      - '8082:8080'
+    environment:
+      << : *default-environment
+      routername: backup
+      configsync_enable: "yes"
+      redundancy_matelink_connectvia: primary
+      redundancy_activestandbyrole: backup
+      service_semp_tlsport: 1943
+    << : *default-common
+
+  monitoring:
+    container_name: monitoring
+    hostname: monitoring
+    ports:
+      - "412:2222"
+      - '8083:8080'
+    environment:
+      << : *default-environment
+      routername: monitoring
+      nodetype: monitoring
+      service_semp_tlsport: 1943
+    << : *default-common
+
+  lb:
+    container_name: lb
+    hostname: lb
+    image: 'haproxy:latest'
+    volumes:
+      - ./assertMaster.perl:/assertMaster.perl
+    environment:
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+    user: root
+    entrypoint:
+      - /bin/bash
+      - "-c"
+      # for debugging
+      #- "sleep 2073600"
+      - "perl /assertMaster.perl"
+    ports:
+      - '8008:8008'
+      - '1443:1443'
+      - '1943:1943'
+      - '1883:1883'
+      - '5671:5671'
+      - '5672:5672'
+      - '8000:8000'
+      - '8080:8080'
+      - '8443:8443'
+      - '8883:8883'
+      - '9000:9000'
+      - '9443:9443'
+      - '55555:55555'
+      - '55003:55003'
+      - '55443:55443'
+      - '1936:1936'
+    networks:
+      - solace-ha-net
