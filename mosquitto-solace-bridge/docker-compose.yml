@@ -30,8 +30,9 @@ x-common:
     - solace-ha-net
 
 volumes:
-  db_data:
-    name: ${VOLUME_ID}
+  mysql-volume:
+    external: true
+    name: ${MYSQL_VOLUME}
 
 services:
 
@@ -42,6 +43,8 @@ services:
     build: mosquitto
     ports:
       - "1895:1883"
+    volumes:
+      - "E:\\Data\\mosquitto:/mosquitto/data"
     networks:
       - solace-ha-net
 
@@ -144,6 +147,9 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - "8989:3306"
+    volumes:
+      #- "mysql-volume:/var/lib/mysql"
+      - "E:\\Data\\mysql:/var/lib/mysql"
     networks:
       - solace-ha-net
 
