@@ -9,6 +9,8 @@ Creates a Mosquitto broker and 2 Solace brokers with HA load balancer and monito
 
 Mosquitto is configured to bridge to Solace via LB.
 
+https://lmddgtfy.net/?q=docker%20compose%20up
+
 # References
 
 ## haproxy Docker
