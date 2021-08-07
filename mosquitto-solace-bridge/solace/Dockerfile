@@ -1,4 +1,3 @@
-#FROM solace-pubsub-standard:latest
-FROM  store/solace/solace-pubsub-standard:9.10.0.12
+FROM solace/solace-pubsub-standard:${TAG:-latest}
 
-LABEL maintainer="Otto Quaglio <otto.q@gmx.com>"
+LABEL maintainer "Otto Quaglio <otto.q@gmx.com>"
