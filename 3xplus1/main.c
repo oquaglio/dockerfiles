@@ -11,21 +11,21 @@
  */
 int main() {
 
-    int num;
-    int start = 1;
-    int end = 10000000;
-    int max_height = 0;
+    unsigned long long num;
+    unsigned long long start = 1;
+    unsigned long long end = 2147483648;
+    unsigned long long max_height = 0;
 
     clock_t t;
     t = clock();
 
     for( num = start; num <= end; num = num + 1 ) {
-        int steps=1;
-        int height=0;
-        int next_num=0;
-        int curr_num = num;
+        unsigned long long steps=0;
+        unsigned long long height=0;
+        unsigned long long next_num=0;
+        unsigned long long curr_num = num;
 
-        printf("\r%d", num);
+        printf("\r%llu", num);
         fflush(stdout);
 
         // iterate until we get back to 1
@@ -47,7 +47,7 @@ int main() {
 
         if(height > max_height) {
             max_height = height;
-            printf("\r%d %d %d\n", num, height, steps);
+            printf("\r%llu %llu %llu\n", num, height, steps);
             fflush(stdout);
         }
 
