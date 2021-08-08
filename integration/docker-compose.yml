@@ -195,6 +195,12 @@ services:
     image: 'mongo:${MONGODB_VERSION}'
     container_name: mongodb
     hostname: mongodb
+    environment:
+      MONGO_DATA_DIR: /data/db
+      #MONGO_LOG_DIR: /dev/null
+    volumes:
+      #- "mysql-volume:/var/lib/mysql"
+      - "E:\\Data\\mongodb:/data/db"
     ports:
       - 27017:27017
     healthcheck:
