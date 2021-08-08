@@ -1,7 +1,7 @@
 version: "3.8"
 
 networks:
-  solace-ha-net: {}
+  integration-network: {}
 
 x-environment:
   &default-environment
@@ -27,7 +27,7 @@ x-common:
       soft: 2448
       hard: 38048
   networks:
-    - solace-ha-net
+    - integration-network
 
 volumes:
   mysql-volume:
@@ -46,7 +46,7 @@ services:
     volumes:
       - "E:\\Data\\mosquitto:/mosquitto/data"
     networks:
-      - solace-ha-net
+      - integration-network
     deploy:
       resources:
         limits:
@@ -152,7 +152,7 @@ services:
       - '55443:55443'
       - '1936:1936'
     networks:
-      - solace-ha-net
+      - integration-network
 
   mysql:
     image: mysql:${MYSQL_VERSION}
@@ -170,7 +170,7 @@ services:
       #- "mysql-volume:/var/lib/mysql"
       - "E:\\Data\\mysql:/var/lib/mysql"
     networks:
-      - solace-ha-net
+      - integration-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -188,10 +188,23 @@ services:
     ports:
       - "${HOST_MACHINE_PMA_PORT}:80"
     networks:
-      - solace-ha-net
+      - integration-network
 
   # TODO: add mongodb
+  mongodb:
+    image: 'mongo:${MONGODB_VERSION}'
+    container_name: mongodb
+    hostname: mongodb
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo  --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
 
+    #volumes:
+      #- "E:\\Data\\mongodb:/var/lib/mysql"
+    #environment:
 
 
   # TDOD: add streamsets
