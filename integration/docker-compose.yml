@@ -19,7 +19,7 @@ x-environment:
 
 x-common:
   &default-common
-  image: solace/solace-pubsub-standard:${TAG:-latest}
+  image: solace/solace-pubsub-standard:${SOLACE_VERSION:-latest}
   shm_size: 1g
   ulimits:
     core: 1
@@ -47,6 +47,14 @@ services:
       - "E:\\Data\\mosquitto:/mosquitto/data"
     networks:
       - solace-ha-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1000M
+        #reservations:
+        #  cpus: '1'
+        #  memory: 200M
 
   #mosquitto:
   #  build: mosquitto
@@ -67,6 +75,13 @@ services:
       redundancy_activestandbyrole: primary
       service_semp_tlsport: 1943
     << : *default-common
+    #volumes:
+      #- "E:\\Data\\primary\\jail:/usr/sw/jail"
+      #- "E:\\Data\\primary\\diags:/var/lib/solace/diags"
+      #- "E:\\Data\\primary\\internalSpool:/usr/sw/internalSpool"
+      #- "E:\\Data\\primary\\softAdb:/usr/sw/internalSpool/softAdb"
+      #- "E:\\Data\\primary\\adb:/usr/sw/adb"
+      #- "E:\\Data\\primary\\var:/usr/sw/var"
 
   backup:
     container_name: backup
@@ -82,6 +97,13 @@ services:
       redundancy_activestandbyrole: backup
       service_semp_tlsport: 1943
     << : *default-common
+    #volumes:
+      #- "E:\\Data\\backup\\jail:/usr/sw/jail"
+      #- "E:\\Data\\backup\\diags:/var/lib/solace/diags"
+      #- "E:\\Data\\backup\\internalSpool:/usr/sw/internalSpool"
+      #- "E:\\Data\\backup\\softAdb:/usr/sw/internalSpool/softAdb"
+      #- "E:\\Data\\backup\\adb:/usr/sw/adb"
+      #- "E:\\Data\\backup\\var:/usr/sw/var"
 
   monitoring:
     container_name: monitoring
@@ -132,19 +154,16 @@ services:
     networks:
       - solace-ha-net
 
-
   mysql:
     image: mysql:${MYSQL_VERSION}
     container_name: ${MYSQL_HOST}
     hostname: ${MYSQL_HOST}
     restart: always
-    env_file:
-      - ".env"
     environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8989:3306"
     volumes:
@@ -153,13 +172,10 @@ services:
     networks:
       - solace-ha-net
 
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: ${PMA_HOST}
     hostname: ${PMA_HOST}
-    env_file:
-      - ".env"
     environment:
       PMA_HOST: ${MYSQL_HOST}
       PMA_PORT: 3306
