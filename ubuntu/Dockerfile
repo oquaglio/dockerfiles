@@ -25,6 +25,7 @@ RUN \
   htop \
   man \
   vim \
+  nano \
   wget \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
@@ -38,30 +39,44 @@ RUN \
   npm \
   --no-install-recommends
 
-# Set environment variables.
+# Set environment variables
 ENV HOME /root
 
-# Add files
+# Define working directory
+WORKDIR $HOME
+
+# Add config files
 ADD root/.bashrc /root/.bashrc
 #ADD root/.gitconfig /root/.gitconfig
 ADD root/.scripts /root/.scripts
 
 # Install Ultimate VIM
 RUN git clone --depth=1 --branch master https://github.com/amix/vimrc.git $HOME/.vim_runtime
-RUN chmod + x $HOME/.vim_runtime/install_awesome_vimrc.sh
+RUN chmod +x $HOME/.vim_runtime/install_awesome_vimrc.sh
 RUN $HOME/.vim_runtime/install_awesome_vimrc.sh
-
-# Define working directory.
-WORKDIR $HOME
 
 # Dotfiles
 RUN git clone --depth 1 --branch master https://github.com/oquaglio/dotfiles.git /root/.dotfiles
+# TODO: Append sourcees for all .dotfiles to config files
 RUN chmod +x /root/.dotfiles/create_symlinks.sh
 RUN /root/.dotfiles/create_symlinks.sh
 
 # Install Oh My Zsh
 # https://github.com/deluan/zsh-in-docker
+# This will replace any existing .zshrc file
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
+
+# Append stuff to ZSH config
+RUN { \
+		#echo ''; \
+    # echo '# Source stuff from .scripts dir'; \
+		#echo 'source $HOME/.scripts/git-completion.sh'; \
+    #echo 'source $HOME/.scripts/z.sh'; \
+    echo ''; \
+    echo '# Source stuff from .dotfiles repo'; \
+    #echo 'source $HOME/.dotfiles/.zshrc'; \
+    echo 'source $HOME/.dotfiles/.aliases'; \
+	} >> $HOME/.zshrc
 
 # Define default command.
 CMD ["zsh"]
