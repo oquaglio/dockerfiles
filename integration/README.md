@@ -1,6 +1,5 @@
 # Mosquitto to Solace Bridge <!-- omit in toc -->
 - [About](#about)
-- [Docker](#docker)
 - [HA Proxy](#ha-proxy)
 - [Solace](#solace)
   - [Ports](#ports)
@@ -15,15 +14,6 @@
 Creates a Mosquitto broker and 2 Solace brokers with HA load balancer and monitoring.
 
 Mosquitto is configured to bridge to Solace via LB.
-
-# Docker
-
-    docker-compose config
-    docker-compose ps
-    docker-compose up -d <service>
-    docker-compose build --no-cache <service>
-    docker-compose up -d --no-deps --build mosquitto
-    ocker-compose down; docker-compose up -d --no-deps --build
 
 # HA Proxy
 
