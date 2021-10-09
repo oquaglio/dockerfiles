@@ -17,6 +17,7 @@ int main() {
     unsigned long long start = 1;
     unsigned long long end = ULLONG_MAX;
     unsigned long long max_height = 0;
+    //unsigned __int128 max_height = 0;
 
     clock_t t = clock(); // CPU time
     struct timespec t_start, t_now;
@@ -27,6 +28,7 @@ int main() {
     for( num = start; num <= end; num = num + 1 ) {
         unsigned long long steps=0;
         unsigned long long height=0;
+        //unsigned __int128 height=0;
         unsigned long long next_num=0;
         unsigned long long curr_num = num;
 
