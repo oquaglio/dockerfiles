@@ -14,7 +14,6 @@ ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install Ubuntu updates and tools
-# note: sed replaces
 RUN \
   apt-get update && apt-get install -y \
   build-essential  \
@@ -32,7 +31,7 @@ RUN \
 
 RUN rm -rf /var/lib/apt/lists/*
 
-# Install pip3 and npm
+# Install apps
 RUN \
   apt update && apt install -y \
   python3-pip \
@@ -45,10 +44,11 @@ ENV HOME /root
 # Define working directory
 WORKDIR $HOME
 
+# TODO get this from source repos
 # Add config files
-ADD root/.bashrc /root/.bashrc
+#ADD root/.bashrc /root/.bashrc
 #ADD root/.gitconfig /root/.gitconfig
-ADD root/.scripts /root/.scripts
+#ADD root/.scripts /root/.scripts
 
 # Install Ultimate VIM
 RUN git clone --depth=1 --branch master https://github.com/amix/vimrc.git $HOME/.vim_runtime
@@ -57,25 +57,38 @@ RUN $HOME/.vim_runtime/install_awesome_vimrc.sh
 
 # Dotfiles
 RUN git clone --depth 1 --branch master https://github.com/oquaglio/dotfiles.git /root/.dotfiles
-# TODO: Append sourcees for all .dotfiles to config files
+# TODO: Append sources for all .dotfiles to config files
 RUN chmod +x /root/.dotfiles/create_symlinks.sh
-RUN /root/.dotfiles/create_symlinks.sh
+# RUN /root/.dotfiles/create_symlinks.sh
+# Create symlinks (overwrite existing)
+RUN ln -sf ~/.dotfiles/.gitconfig ~/.gitconfig
+RUN ln -sf ~/.dotfiles/.gitmessage ~/.gitmessage
+RUN ln -sf ~/.dotfiles/.gitignore ~/.gitignore
+RUN ln -sf ~/.dotfiles/.nanorc ~/.nanorc
+RUN ln -sf ~/.dotfiles/.vimrc ~/.vimrc
+
+RUN git config --global core.excludesfile ~/.gitignore
+
+# Scripts
+RUN git clone --depth=1 --branch master https://github.com/rupa/z.git $HOME/.scripts/z
+#RUN sh -c "$(wget -P $HOME/.scripts/ https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh)"
 
 # Install Oh My Zsh
 # https://github.com/deluan/zsh-in-docker
 # This will replace any existing .zshrc file
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
 
-# Append stuff to ZSH config
+# Append to .zshrc
 RUN { \
-		#echo ''; \
-    # echo '# Source stuff from .scripts dir'; \
-		#echo 'source $HOME/.scripts/git-completion.sh'; \
-    #echo 'source $HOME/.scripts/z.sh'; \
+		echo ''; \
+    echo '# Source files from .scripts dir'; \
+		#echo 'source $HOME/.scripts/git-completion.zsh'; \
+    echo 'source $HOME/.scripts/z/z.sh'; \
     echo ''; \
-    echo '# Source stuff from .dotfiles repo'; \
+    echo '# Source files from .dotfiles repo'; \
     #echo 'source $HOME/.dotfiles/.zshrc'; \
     echo 'source $HOME/.dotfiles/.aliases'; \
+    echo 'source $HOME/.dotfiles/.env'; \
 	} >> $HOME/.zshrc
 
 # Define default command.

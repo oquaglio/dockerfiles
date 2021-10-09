@@ -190,12 +190,15 @@ services:
     networks:
       - integration-network
 
-  # TODO: add mongodb
+
   mongodb:
     image: 'mongo:${MONGODB_VERSION}'
     container_name: mongodb
     hostname: mongodb
     environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_SERVER: mongo
       MONGO_DATA_DIR: /data/db
       #MONGO_LOG_DIR: /dev/null
     volumes:
@@ -207,10 +210,37 @@ services:
       test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo  --quiet) -eq 1
       interval: 10s
       start_period: 30s
+    networks:
+      - integration-network
 
     #volumes:
       #- "E:\\Data\\mongodb:/var/lib/mysql"
     #environment:
 
 
-  # TDOD: add streamsets
+
+  sdc1:
+    container_name: sdc1
+    hostname: sdc1
+    image: streamsets/datacollector:latest
+    ports:
+      - '18630:18630'
+    networks:
+      - integration-network
+
+
+  nifi:
+    image: apache/nifi:latest
+    container_name: nifi
+    hostname: nifi
+    ports:
+      - 9090:9090
+      - 8444:8443
+    environment:
+      - NIFI_WEB_HTTP_PORT=9090
+    networks:
+      - integration-network
+    deploy:
+      resources:
+        limits:
+          memory: 500m
