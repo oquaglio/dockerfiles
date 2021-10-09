@@ -1,0 +1,6 @@
+# vim swap/ lock file
+*.swp
+
+*.log
+*.lock
+*.tmp
