@@ -1,7 +1,7 @@
 version: "3.8"
 
 networks:
-  integration-network: {}
+  solace-ha-net: {}
 
 x-environment:
   &default-environment
@@ -19,7 +19,7 @@ x-environment:
 
 x-common:
   &default-common
-  image: solace/solace-pubsub-standard:${SOLACE_VERSION:-latest}
+  image: solace/solace-pubsub-standard:${TAG:-latest}
   shm_size: 1g
   ulimits:
     core: 1
@@ -27,12 +27,11 @@ x-common:
       soft: 2448
       hard: 38048
   networks:
-    - integration-network
+    - solace-ha-net
 
 volumes:
-  mysql-volume:
-    external: true
-    name: ${MYSQL_VOLUME}
+  db_data:
+    name: ${VOLUME_ID}
 
 services:
 
@@ -43,18 +42,8 @@ services:
     build: mosquitto
     ports:
       - "1895:1883"
-    volumes:
-      - "E:\\Data\\mosquitto:/mosquitto/data"
     networks:
-      - integration-network
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1000M
-        #reservations:
-        #  cpus: '1'
-        #  memory: 200M
+      - solace-ha-net
 
   #mosquitto:
   #  build: mosquitto
@@ -75,13 +64,6 @@ services:
       redundancy_activestandbyrole: primary
       service_semp_tlsport: 1943
     << : *default-common
-    #volumes:
-      #- "E:\\Data\\primary\\jail:/usr/sw/jail"
-      #- "E:\\Data\\primary\\diags:/var/lib/solace/diags"
-      #- "E:\\Data\\primary\\internalSpool:/usr/sw/internalSpool"
-      #- "E:\\Data\\primary\\softAdb:/usr/sw/internalSpool/softAdb"
-      #- "E:\\Data\\primary\\adb:/usr/sw/adb"
-      #- "E:\\Data\\primary\\var:/usr/sw/var"
 
   backup:
     container_name: backup
@@ -97,13 +79,6 @@ services:
       redundancy_activestandbyrole: backup
       service_semp_tlsport: 1943
     << : *default-common
-    #volumes:
-      #- "E:\\Data\\backup\\jail:/usr/sw/jail"
-      #- "E:\\Data\\backup\\diags:/var/lib/solace/diags"
-      #- "E:\\Data\\backup\\internalSpool:/usr/sw/internalSpool"
-      #- "E:\\Data\\backup\\softAdb:/usr/sw/internalSpool/softAdb"
-      #- "E:\\Data\\backup\\adb:/usr/sw/adb"
-      #- "E:\\Data\\backup\\var:/usr/sw/var"
 
   monitoring:
     container_name: monitoring
@@ -121,7 +96,7 @@ services:
   lb:
     container_name: lb
     hostname: lb
-    image: 'haproxy:${HAPROXY_VERSION}'
+    image: 'haproxy:latest'
     volumes:
       - ./assertMaster.perl:/assertMaster.perl
     environment:
@@ -152,30 +127,33 @@ services:
       - '55443:55443'
       - '1936:1936'
     networks:
-      - integration-network
+      - solace-ha-net
+
 
   mysql:
     image: mysql:${MYSQL_VERSION}
     container_name: ${MYSQL_HOST}
     hostname: ${MYSQL_HOST}
     restart: always
+    env_file:
+      - ".env"
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - "8989:3306"
-    volumes:
-      #- "mysql-volume:/var/lib/mysql"
-      - "E:\\Data\\mysql:/var/lib/mysql"
     networks:
-      - integration-network
+      - solace-ha-net
+
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: ${PMA_HOST}
     hostname: ${PMA_HOST}
+    env_file:
+      - ".env"
     environment:
       PMA_HOST: ${MYSQL_HOST}
       PMA_PORT: 3306
@@ -188,59 +166,4 @@ services:
     ports:
       - "${HOST_MACHINE_PMA_PORT}:80"
     networks:
-      - integration-network
-
-
-  mongodb:
-    image: 'mongo:${MONGODB_VERSION}'
-    container_name: mongodb
-    hostname: mongodb
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: root
-      ME_CONFIG_MONGODB_SERVER: mongo
-      MONGO_DATA_DIR: /data/db
-      #MONGO_LOG_DIR: /dev/null
-    volumes:
-      #- "mysql-volume:/var/lib/mysql"
-      - "E:\\Data\\mongodb:/data/db"
-    ports:
-      - 27017:27017
-    healthcheck:
-      test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo  --quiet) -eq 1
-      interval: 10s
-      start_period: 30s
-    networks:
-      - integration-network
-
-    #volumes:
-      #- "E:\\Data\\mongodb:/var/lib/mysql"
-    #environment:
-
-
-
-  sdc1:
-    container_name: sdc1
-    hostname: sdc1
-    image: streamsets/datacollector:latest
-    ports:
-      - '18630:18630'
-    networks:
-      - integration-network
-
-
-  nifi:
-    image: apache/nifi:latest
-    container_name: nifi
-    hostname: nifi
-    ports:
-      - 9090:9090
-      - 8444:8443
-    environment:
-      - NIFI_WEB_HTTP_PORT=9090
-    networks:
-      - integration-network
-    deploy:
-      resources:
-        limits:
-          memory: 500m
+      - solace-ha-net

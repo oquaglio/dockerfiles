@@ -1,3 +1,4 @@
+# This is an Alipne based image
 FROM eclipse-mosquitto
 LABEL maintainer="Otto Quaglio <otto.q@gmx.com>"
 
@@ -16,4 +17,5 @@ CMD [“echo”,”Image created”]
 
 
 # todos
-# Add built latest from mosquitto code  
+# install performance monitoring tools
+# Add built latest from mosquitto code
