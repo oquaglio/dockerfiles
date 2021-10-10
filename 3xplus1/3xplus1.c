@@ -14,7 +14,9 @@
 int main() {
 
     unsigned long long num;
-    unsigned long long start = 1;
+    //unsigned long long start = 1;
+    //unsigned long long start = 319804831; // first "contested" number
+    unsigned long long start = 1184102895;
     unsigned long long end = ULLONG_MAX;
     unsigned long long max_height = 0;
     //unsigned __int128 max_height = 0;
@@ -43,8 +45,17 @@ int main() {
 
             if (curr_num % 2 == 0)
                 curr_num = curr_num / 2;
-            else
-                curr_num= 3 * curr_num + 1;
+            else {
+                // check if we've passed the max size supported by number format
+                unsigned long long temp;
+                temp = 3 * curr_num + 1;
+                if (((temp -1)/3) == curr_num)
+                    curr_num = temp;
+                else  {
+                    printf("\nError at %llu", curr_num);
+                    return 0;
+                }
+            }
 
             steps++;
 
