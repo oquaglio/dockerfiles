@@ -1,6 +1,6 @@
 # hello-world
 
-A web server using flask.
+A REST API web server using flask.
 
 ## python:alpine3.10
 
