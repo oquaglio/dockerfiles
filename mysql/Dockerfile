@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM ottoq/ubuntu:0.5
+FROM ottoq/ubuntu:latest
 # https://registry.hub.docker.com/r/phusion/baseimage/
 #FROM phusion/baseimage:master
 

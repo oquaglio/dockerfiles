@@ -18,15 +18,22 @@ RUN \
   apt-get update && apt-get install -y \
   build-essential  \
   software-properties-common \
+  iputils-ping \
   byobu \
   curl \
-  git \
+  git-all \
   htop \
   man \
   vim \
   nano \
   wget \
-  --no-install-recommends \
+  awscli \
+  jq \
+  python3 \
+  python3-pip \
+  openssh-client \
+  nodejs \
+  --no-install-recommends \ b
   && rm -rf /var/lib/apt/lists/*
 
 RUN rm -rf /var/lib/apt/lists/*

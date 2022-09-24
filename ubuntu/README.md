@@ -1,7 +1,6 @@
-# Yo
+# Summary
 
-This Dockerfile is to demo stuff
-
+Attempt at general purpose linux environment. Largeish.
 
 
 # Update amd Install tools

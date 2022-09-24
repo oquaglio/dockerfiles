@@ -13,7 +13,7 @@ RUN apk add --update logrotate
 
 
 
-CMD [“echo”,”Image created”]
+# CMD [“echo”,”Image created”]
 
 
 # todos
