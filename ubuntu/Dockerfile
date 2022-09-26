@@ -13,37 +13,43 @@ LABEL maintainer "Otto Quaglio <otto.q@gmx.com>"
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install Ubuntu updates and tools
+  # Install Ubuntu updates and tools
 RUN \
-  apt-get update && apt-get install -y \
+  apt-get update && apt-get install -y --no-install-recommends \
+  #apt-transport-https \
   build-essential  \
   software-properties-common \
-  iputils-ping \
-  byobu \
-  curl \
-  git-all \
-  htop \
+  ca-certificates ssh-client \
   man \
-  vim \
-  nano \
-  wget \
-  awscli \
-  jq \
-  python3 \
+  sudo passwd \
+  # Utils
+  openssh-client openssh-server \
+  # procps \
+  iputils-ping \
+  #git-all \
+  git \
+  curl less wget jq tree htop \
+  vim nano \
+  # Build tools
+  npm \
+  openjdk-8-jdk \
+  libssl-dev \
   python3-pip \
-  openssh-client \
+  python3 \
+  cmake \
   nodejs \
-  --no-install-recommends \ b
+  # Apps
+  awscli \
   && rm -rf /var/lib/apt/lists/*
 
-RUN rm -rf /var/lib/apt/lists/*
+# for kubectl package
+RUN curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
 
-# Install apps
 RUN \
-  apt update && apt install -y \
-  python3-pip \
-  npm \
-  --no-install-recommends
+  apt-get update && apt-get install -y --no-install-recommends \
+  kubectl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV HOME /root
@@ -80,10 +86,11 @@ RUN git config --global core.excludesfile ~/.gitignore
 RUN git clone --depth=1 --branch master https://github.com/rupa/z.git $HOME/.scripts/z
 #RUN sh -c "$(wget -P $HOME/.scripts/ https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh)"
 
-# Install Oh My Zsh
+# Install Oh My Zsh (includes zsh)
 # https://github.com/deluan/zsh-in-docker
 # This will replace any existing .zshrc file
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
+RUN yes | sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.2/zsh-in-docker.sh)" -- \
+-p git -p aws
 
 # Append to .zshrc
 RUN { \
@@ -97,6 +104,8 @@ RUN { \
     echo 'source $HOME/.dotfiles/.aliases'; \
     echo 'source $HOME/.dotfiles/.env'; \
 	} >> $HOME/.zshrc
+
+RUN chsh -s $(which zsh)
 
 # Define default command.
 CMD ["zsh"]
