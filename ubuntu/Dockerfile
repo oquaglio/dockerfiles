@@ -24,6 +24,7 @@ RUN \
   sudo passwd \
   # Utils
   openssh-client openssh-server \
+  skopeo \
   # procps \
   iputils-ping \
   #git-all \
