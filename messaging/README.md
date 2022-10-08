@@ -2,5 +2,6 @@
 
  Eclipse Paho MQTT Python client library
  Solace
-
+```
  docker build  --tag ottoq/messaging:0.1 --no-cache .
+ ```
