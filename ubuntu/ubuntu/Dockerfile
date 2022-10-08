@@ -16,6 +16,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
   # Install Ubuntu updates and tools
 RUN \
   apt-get update && apt-get install -y --no-install-recommends \
+  #apt-get install -y --no-install-recommends \
   #apt-transport-https \
   build-essential  \
   software-properties-common \
@@ -25,6 +26,7 @@ RUN \
   # Utils
   openssh-client openssh-server \
   skopeo \
+  gnupg \
   # procps \
   iputils-ping \
   #git-all \
@@ -40,8 +42,7 @@ RUN \
   cmake \
   nodejs \
   # Apps
-  awscli \
-  && rm -rf /var/lib/apt/lists/*
+  awscli
 
 # for kubectl package
 RUN curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -91,7 +92,7 @@ RUN git clone --depth=1 --branch master https://github.com/rupa/z.git $HOME/.scr
 # https://github.com/deluan/zsh-in-docker
 # This will replace any existing .zshrc file
 RUN yes | sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.2/zsh-in-docker.sh)" -- \
--p git -p aws
+  -p git -p aws
 
 # Append to .zshrc
 RUN { \

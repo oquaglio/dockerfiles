@@ -1,0 +1,35 @@
+version: "3.8"
+
+
+services:
+  ubuntu:
+    container_name: ubuntu
+    hostname: ubuntu
+    build: ubuntu
+    volumes:
+      - cmd-history-volume:/command-history
+    #tty: true
+    command: tail -f /dev/null
+
+  terraform:
+    container_name: ubuntu-terraform
+    hostname: ubuntu-terraform
+    build: terraform
+    volumes:
+      - cmd-history-volume:/command-history
+    #tty: true
+    command: tail -f /dev/null
+
+#  wsl:
+#    container_name: ubuntu-wsl
+#    hostname: ubuntu-wsl
+#    build: wsl
+#    volumes:
+#      - cmd-history-volume:/command-history
+#    #tty: true
+#    command: tail -f /dev/null
+
+volumes:
+  cmd-history-volume:
+    external: true
+    name: ${COMMAND_HISTORY_VOLUME}
