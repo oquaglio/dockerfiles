@@ -10,9 +10,9 @@ These containers will be dependent on external volumes. See Instructions.
 
 ## Links
 
-https://github.com/deluan/zsh-in-docker/
-https://github.com/spaceship-prompt/spaceship-prompt/
-https://www.soberkoder.com/better-zsh-history/
+- https://github.com/deluan/zsh-in-docker/
+- https://github.com/spaceship-prompt/spaceship-prompt/
+- https://www.soberkoder.com/better-zsh-history/
 
 ## Instructions
 
