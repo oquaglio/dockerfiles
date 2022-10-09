@@ -13,8 +13,7 @@ https://github.com/spaceship-prompt/spaceship-prompt/
 
 ```
 docker-compose up -d
-docker exec -it ubuntu zsh
-docker exec -it ubuntu-terraform zsh
+docker exec -it <container> zsh
 ```
 ## Todos
 
