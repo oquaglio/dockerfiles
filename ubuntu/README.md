@@ -24,9 +24,12 @@ docker volume create shell-history-volume
 Set variables (Powershell):
 ``` Powershell
 $Env:COMPOSE_VAR_COMMAND_HISTORY_VOLUME="shell-history-volume"; `
-$Env:COMPOSE_VAR_DOCKER_REPO_NAME="<repo>"
+$Env:COMPOSE_VAR_DOCKER_REPO_NAME="<repo>"; `
+$Env:COMPOSE_VAR_USERNAME="<user for containers>";
 ```
-Where <repo> is your Docker account.
+Where:
+- <repo> is your Docker account.
+- <user for containers> is the local user for the containers
 
 
 Check vars:

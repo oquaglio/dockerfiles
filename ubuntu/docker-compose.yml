@@ -37,18 +37,27 @@ services:
         - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-terraform:latest"
     volumes:
       - cmd-history-volume:${COMMAND_HISTORY_VOLUME_MOUNT_POINT?err}
-    #tty: true
-    command: tail -f /dev/null
+    tty: true
+    #command: tail -f /dev/null
     env_file:
       - ".env"
-#  wsl:
-#    container_name: ubuntu-wsl
-#    hostname: ubuntu-wsl
-#    build: wsl
-#    volumes:
-#      - cmd-history-volume:/command-history
-#    #tty: true
-#    command: tail -f /dev/null
+  wsl:
+    container_name: ubuntu-wsl
+    hostname: ubuntu-wsl
+    build:
+      context: wsl
+      dockerfile: ./Dockerfile
+      args:
+        - user:${COMPOSE_VAR_USERNAME}
+      tags:
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-wsl:hydrogen"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-wsl:0.1"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-wsl:0.1.0"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-wsl:latest"
+    volumes:
+      - cmd-history-volume:${COMMAND_HISTORY_VOLUME_MOUNT_POINT?err}
+    tty: true
+    #command: tail -f /dev/null
 
 volumes:
   cmd-history-volume:
