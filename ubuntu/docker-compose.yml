@@ -5,10 +5,21 @@ services:
   ubuntu:
     container_name: ubuntu
     hostname: ubuntu
-    build: ubuntu
+    build:
+      context: ubuntu
+      dockerfile: ./Dockerfile
+      tags:
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu:hydrogen"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu:0.6"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu:0.6.4"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu:latest"
+      args:
+      - GIT_COMMIT=cdc3b19
     volumes:
-      - cmd-history-volume:/volumes/command-history
-    #tty: true
+      - cmd-history-volume:${COMMAND_HISTORY_VOLUME_MOUNT_POINT?err}
+    environment:
+      - CMD_HIST=${COMMAND_HISTORY_VOLUME_MOUNT_POINT?err}
+    tty: true
     command: tail -f /dev/null
     env_file:
       - ".env"
@@ -16,9 +27,16 @@ services:
   terraform:
     container_name: ubuntu-terraform
     hostname: ubuntu-terraform
-    build: terraform
+    build:
+      context: terraform
+      dockerfile: ./Dockerfile
+      tags:
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-terraform:hydrogen"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-terraform:0.1"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-terraform:0.1.0"
+        - "${COMPOSE_VAR_DOCKER_REPO_NAME?err}/ubuntu-terraform:latest"
     volumes:
-      - cmd-history-volume:/volumes/command-history
+      - cmd-history-volume:${COMMAND_HISTORY_VOLUME_MOUNT_POINT?err}
     #tty: true
     command: tail -f /dev/null
     env_file:
@@ -35,4 +53,4 @@ services:
 volumes:
   cmd-history-volume:
     external: true
-    name: ${COMMAND_HISTORY_VOLUME}
+    name: ${COMPOSE_VAR_COMMAND_HISTORY_VOLUME?err}

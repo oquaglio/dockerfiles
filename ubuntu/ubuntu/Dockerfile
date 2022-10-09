@@ -105,6 +105,21 @@ RUN { \
     #echo 'source $HOME/.dotfiles/.zshrc'; \
     echo 'source $HOME/.dotfiles/.aliases'; \
     echo 'source $HOME/.dotfiles/.env'; \
+    echo '# Setup our ZSH history'; \
+    # HISTORY config (send to external volume)
+    echo ''; \
+    echo 'export HISTFILE=/volumes/command-history/.zsh_history'; \
+    echo 'export HISTFILESIZE=1000000000'; \
+    echo 'export HISTSIZE=1000000000'; \
+    echo '# Make it append immediately rather than on exit'; \
+    echo 'setopt INC_APPEND_HISTORY'; \
+    echo 'export HISTTIMEFORMAT="[%F %T] "'; \
+    echo '# Add timestamp to history'; \
+    echo 'setopt EXTENDED_HISTORY'; \
+    echo '# Skip dups'; \
+    echo 'setopt HIST_FIND_NO_DUPS'; \
+    echo '# Don''t even write dups to history'; \
+    echo 'setopt HIST_IGNORE_ALL_DUPS'; \
 	} >> $HOME/.zshrc
 
 RUN chsh -s $(which zsh)
