@@ -7,19 +7,22 @@ services:
     hostname: ubuntu
     build: ubuntu
     volumes:
-      - cmd-history-volume:/command-history
+      - cmd-history-volume:/volumes/command-history
     #tty: true
     command: tail -f /dev/null
+    env_file:
+      - ".env"
 
   terraform:
     container_name: ubuntu-terraform
     hostname: ubuntu-terraform
     build: terraform
     volumes:
-      - cmd-history-volume:/command-history
+      - cmd-history-volume:/volumes/command-history
     #tty: true
     command: tail -f /dev/null
-
+    env_file:
+      - ".env"
 #  wsl:
 #    container_name: ubuntu-wsl
 #    hostname: ubuntu-wsl
