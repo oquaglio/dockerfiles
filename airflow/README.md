@@ -1,5 +1,7 @@
 #
 
+Note: moved to https://github.com/oquaglio/airflow
+
 ## Links
 
 https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#running-airflow-in-docker
@@ -10,10 +12,8 @@ https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index
 Compose file will create:
 
 ```
-local     airflow_airflow-postgres-db-volume
-local     airflow_airflow-volume
+local     airflow_postgres-db-volume
 ```
-
 ## Init
 
 On all operating systems, you need to run database migrations and create the first user account. To do this, run:
@@ -43,6 +43,22 @@ Check running containers:
 ```
 docker-compose ps
 
+```
+
+## DAG Files
+
+Files in /dags will get mounted to all containers using airflow-common :
+
+- airflow-airflow-worker-1
+- airflow-airflow-scheduler-1
+- airflow-airflow-webserver-1
+
+mounted to:
+```
+/dags
+```
+```
+airflow@7c05c27b14c3:/opt/airflow/dags$
 ```
 
 ## Cleanup Everything
