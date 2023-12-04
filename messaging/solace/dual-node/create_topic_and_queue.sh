@@ -12,10 +12,20 @@
 # - TOPIC_NAME: The name of the topic to subscribe to the queue.
 # - ENCODED_QUEUE_NAME: The URL-encoded name of the queue to use in the API request.
 
+# Check if enough arguments are provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <host> <port>"
+    exit 1
+fi
+
+# Extract arguments
+HOST=$1
+PORT=$2
+
 # Admin credentials
 ADMIN_USER="admin"
 ADMIN_PASSWORD="admin"
-SOLACE_URL="http://localhost:8080"  # Adjust if using a different port or host
+SOLACE_URL="http://$HOST:$PORT"  # Adjust if using a different port or host
 
 # Queue and topic names
 QUEUE_NAME="q/minaus/waio/sf/cam/trackmeasurement/recorded/v1"
