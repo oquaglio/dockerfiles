@@ -26,3 +26,7 @@ docker compose -f docker-compose.yml up -d
 ## Stop
 
 docker compose -f docker-compose.yml down
+
+## Permissions
+
+Make sure to allow acccess for clients to consume from queue (queue settings on Solace)
