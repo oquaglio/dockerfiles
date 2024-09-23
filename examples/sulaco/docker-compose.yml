@@ -1,0 +1,42 @@
+version: '3.8'
+
+networks:
+  sulaco:
+    driver: bridge
+
+services:
+  ripley:
+    build: ./ripley
+    container_name: ripley
+    networks:
+      - sulaco
+    ports:
+      - "8082:80" # Expose the HTTP server on port 8080
+    depends_on:
+      - bishop
+
+  bishop:
+    build: ./bishop
+    container_name: bishop
+    networks:
+      - sulaco
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: exampledb
+    ports:
+      - "5442:5432" # Expose the PostgreSQL server
+
+  hicks:
+    build: ./hicks
+    container_name: hicks
+    networks:
+      - sulaco
+    command: [ "sleep", "infinity" ] # Placeholder container that does nothing
+
+  newt:
+    build: ./newt
+    container_name: newt
+    networks:
+      - sulaco
+    command: [ "sleep", "infinity" ] # Placeholder container that does nothing

@@ -1,0 +1,20 @@
+services:
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "65432:65432" # Expose the port
+    networks:
+      - py-socket-net
+
+  client:
+    build: ./client
+    container_name: client
+    depends_on:
+      - server
+    networks:
+      - py-socket-net
+
+networks:
+  py-socket-net:
+    driver: bridge
