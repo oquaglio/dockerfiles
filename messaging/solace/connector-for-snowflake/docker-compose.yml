@@ -1,0 +1,67 @@
+services:
+  solace-broker:
+    image: solace/solace-pubsub-standard
+    container_name: solace-broker
+    hostname: solace-broker
+    ports:
+      - "8085:8080"     # Web UI
+      - "55555:55555"   # SMF
+      - "8008:8008"     # REST
+      - "1883:1883"     # MQTT
+      - "5672:5672"     # AMQP
+      - "9000:9000"     # REST messaging ingress
+    environment:
+      username_admin_globalaccesslevel: admin
+      username_admin_password: admin
+    shm_size: "2g"
+    networks:
+      - solace-net
+
+  # snowflake-connector:
+  #   image: solace/solace-pubsub-connector-snowflake
+  #   container_name: snowflake-connector
+  #   depends_on:
+  #     - solace-broker
+  #   volumes:
+  #     - ./final_config.json:/config.json:ro
+  #     - "${SNOWFLAKE_PRIVATE_KEY_PATH}:/secrets/rsa_key.p8:ro"
+  #   command: ["--config", "/config.json"]
+  #   networks:
+  #     - solace-net
+  #   environment:
+  #     SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: "${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE}"
+
+  solace-pubsub-connector-snowflake:
+    image: solace/solace-pubsub-connector-snowflake:3.2.10
+    environment:
+      SOLACE_JAVA_HOST: ${SOLACE_JAVA_HOST:-host.docker.internal:55555}
+      # Create a read-only user for the healthcheck
+      # Note: This will override all users defined in config files.
+      SOLACE_CONNECTOR_SECURITY_USERS_0_NAME: ${HEALTHCHECK_USER_NAME:?HEALTHCHECK_USER_NAME must be set}
+      SOLACE_CONNECTOR_SECURITY_USERS_0_PASSWORD: ${HEALTHCHECK_USER_PASSWORD:?HEALTHCHECK_USER_PASSWORD must be set}
+      #SNOWFLAKE_PRIVATE_KEY_PATH: ${SNOWFLAKE_PRIVATE_KEY_PATH:?SNOWFLAKE_PRIVATE_KEY_PATH must be set}
+      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE:?SNOWFLAKE_PRIVATE_KEY_PASSPHRASE must be set}
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -O - http://${HEALTHCHECK_USER_NAME}:${HEALTHCHECK_USER_PASSWORD}@localhost:8090/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+    ports:
+      - '8090:8090'
+    volumes:
+      # - type: bind
+      #   source: ../../libs/
+      #   target: /app/external/libs/
+      #   read_only: true
+      - type: bind
+        source: ./config/
+        target: /app/external/spring/config/
+        read_only: true
+      - "${SNOWFLAKE_PRIVATE_KEY_PATH}:/secrets/rsa_key.p8:ro"
+    networks:
+      - solace-net
+
+networks:
+  solace-net:
+    driver: bridge

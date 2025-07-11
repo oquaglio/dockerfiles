@@ -1,0 +1,25 @@
+{
+    "solace": {
+        "host": "tcp://solace-broker:55555",
+        "vpn": "default",
+        "username": "admin",
+        "password": "admin",
+        "topics": [
+            "events/snowflake"
+        ]
+    },
+    "snowflake": {
+        "ingestMode": "STREAMING",
+        "account": "${SNOWFLAKE_ACCOUNT}",
+        "username": "${SNOWFLAKE_ADMIN_USER}",
+        "privateKeyFile": "${SNOWFLAKE_PRIVATE_KEY_PATH}",
+        "privateKeyPassphrase": "${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE}",
+        "database": "${SNOWFLAKE_DB_NAME}",
+        "schema": "${SNOWFLAKE_SCHEMA_NAME}",
+        "table": "SOLACE_STREAMED",
+        "warehouse": "${SNOWFLAKE_DEFAULT_WAREHOUSE}",
+        "role": "${SNOWFLAKE_ADMIN_ROLE}",
+        "clientName": "solace_stream_client",
+        "channelName": "solace_stream_channel"
+    }
+}
